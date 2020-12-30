@@ -1,0 +1,11 @@
+[Unit]
+ Description=Hello World Service
+ After=multi-user.target
+
+ [Service]
+ Type=idle  
+ ExecStart=/usr/bin/python /home/pi/13_12_scanner/examples/scanner.py
+ User=pi  
+
+ [Install]  
+ WantedBy=multi-user.target 
