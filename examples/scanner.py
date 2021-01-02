@@ -14,10 +14,12 @@ name = data['id']
 ip = data['ip']
 BT_ADDR_LIST = []
 threads = []
+def statusupdate(status):
+    client.publish("status" + name, status)
 def on_connect(client, userdata, flags, rc):
     print("Connected with result code " + str(rc))
     client.subscribe("search" + name)
-
+    statusupdate("ready")
 def on_message(client, userdata, msg):
     if msg.topic == "search" + name:
         payload = str(msg.payload).split(",")
