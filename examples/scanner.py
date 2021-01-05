@@ -7,6 +7,7 @@ import sys
 import subprocess
 import paho.mqtt.client as mqtt
 import json
+import hashlib
 
 with open('/home/pi/data.json') as json_file:
     data = json.load(json_file)
@@ -14,12 +15,17 @@ name = data['id']
 ip = data['ip']
 BT_ADDR_LIST = []
 threads = []
+def encrypt_string(hash_string):
+    sha_signature = \
+        hashlib.sha256(hash_string.encode()).hexdigest()
+    return sha_signature
 def statusupdate(status):
     client.publish("status" + name, status)
 def on_connect(client, userdata, flags, rc):
     print("Connected with result code " + str(rc))
     client.subscribe("search" + name)
     statusupdate("ready")
+
 def on_message(client, userdata, msg):
     if msg.topic == "search" + name:
         payload = str(msg.payload).split(",")
@@ -35,6 +41,7 @@ def on_message(client, userdata, msg):
             time.sleep(float(time_sleep))
             th = start_thread(addr=addr, callback=dummy_callback)
             threads.append(th)
+
 
 def on_disconnect(client, userdata, rc):
     if rc != 0:
@@ -55,15 +62,14 @@ def dummy_callback():
 
 def bluetooth_listen(
         addr, callback, sleep=3, daily=True, debug=False):
-    while True:        
+    while True:      
         b = BluetoothRSSI(addr=addr)
         rssi = b.get_rssi()
         if rssi != None:
             print(addr + str(rssi))
             client.publish("SmartCoast/Daten/" + name, "{\""+ addr + "\":" + str(rssi) + "}")
         time.sleep(3)
-
-
+    
 
 def start_thread(addr, callback,  sleep=SLEEP,
         daily=DAILY, debug=DEBUG):
@@ -90,6 +96,7 @@ def start_thread(addr, callback,  sleep=SLEEP,
 def main():
     while True:
         time.sleep(1)
+client.username_pw_set(name,encrypt_string(name))
 
 client.connect(ip, 1883)
 
