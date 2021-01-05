@@ -6,6 +6,7 @@
  Type=idle  
  ExecStart=/usr/bin/python /home/pi/scanner/examples/scanner.py
  User=pi  
-
+ RestartSec=3
+ Restart=on-failure
  [Install]  
  WantedBy=multi-user.target 
