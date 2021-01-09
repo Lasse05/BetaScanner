@@ -15,6 +15,7 @@ name = data['id']
 ip = data['ip']
 BT_ADDR_LIST = []
 threads = []
+version = 1
 def encrypt_string(hash_string):
     sha_signature = \
         hashlib.sha256(hash_string.encode()).hexdigest()
@@ -24,6 +25,7 @@ def statusupdate(status):
 def on_connect(client, userdata, flags, rc):
     print("Connected with result code " + str(rc))
     client.subscribe("search" + name)
+    client.publish("version" + name, version)
     statusupdate("ready")
 
 def on_message(client, userdata, msg):
